@@ -1,0 +1,263 @@
+version: '2'
+
+volumes:
+  orderer.pharma.net:
+  peer0.manufacturer.pharma.net:
+  peer1.manufacturer.pharma.net:
+  peer0.distributor.pharma.net:
+  peer1.distributor.pharma.net:
+  peer0.retailer.pharma.net:
+  peer1.retailer.pharma.net:
+  peer0.transporter.pharma.net:
+  peer1.transporter.pharma.net:
+  # peer0.consumer.pharma.net:
+  # peer1.consumer.pharma.net:
+
+networks:
+  pharma:
+
+services:
+
+  ca.manufacturer.pharma.net:
+    image: hyperledger/fabric-ca:latest
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.manufacturer.pharma.net
+      - FABRIC_CA_SERVER_TLS_ENABLED=false
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.manufacturer.pharma.net-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+      - FABRIC_CA_SERVER_PORT=7054
+    ports:
+      - "7054:7054"
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.manufacturer.pharma.net-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/manufacturer.pharma.net/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca.manufacturer.pharma.net
+    networks:
+      - pharma
+
+  ca.distributor.pharma.net:
+    image: hyperledger/fabric-ca:latest
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.distributor.pharma.net
+      - FABRIC_CA_SERVER_TLS_ENABLED=false
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.distributor.pharma.net-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+      - FABRIC_CA_SERVER_PORT=8054
+    ports:
+      - "8054:8054"
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.distributor.pharma.net-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/distributor.pharma.net/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca.distributor.pharma.net
+    networks:
+      - pharma
+
+  ca.retailer.pharma.net:
+    image: hyperledger/fabric-ca:latest
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.retailer.pharma.net
+      - FABRIC_CA_SERVER_TLS_ENABLED=false
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.retailer.pharma.net-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+      - FABRIC_CA_SERVER_PORT=9054
+    ports:
+      - "9054:9054"
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.retailer.pharma.net-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/retailer.pharma.net/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca.retailer.pharma.net
+    networks:
+      - pharma
+
+  ca.transporter.pharma.net:
+    image: hyperledger/fabric-ca:latest
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.transporter.pharma.net
+      - FABRIC_CA_SERVER_TLS_ENABLED=false
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.transporter.pharma.net-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+      - FABRIC_CA_SERVER_PORT=10054
+    ports:
+      - "10054:10054"
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.transporter.pharma.net-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -b admin:adminpw -d'
+    networks:
+      - pharma
+
+
+  # ca.consumer.pharma.net:
+  #   image: hyperledger/fabric-ca:latest
+  #   environment:
+  #     - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+  #     - FABRIC_CA_SERVER_CA_NAME=ca.consumer.pharma.net
+  #     - FABRIC_CA_SERVER_TLS_ENABLED=false
+  #     - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.consumer.pharma.net-cert.pem
+  #     - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+  #     - FABRIC_CA_SERVER_PORT=11054
+  #   ports:
+  #     - "11054:11054"
+  #   command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.consumer.pharma.net-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -b admin:adminpw -d'
+  #   networks:
+  #     - pharma
+  #
+
+  orderer.pharma.net:
+    extends:
+      file: docker-base/docker-compose-base.yaml
+      service: orderer.pharma.net
+    container_name: orderer.pharma.net
+    networks:
+      - pharma
+
+  peer0.manufacturer.pharma.net:
+    container_name: peer0.manufacturer.pharma.net
+    extends:
+      file:  docker-base/docker-compose-base.yaml
+      service: peer0.manufacturer.pharma.net
+    networks:
+      - pharma
+
+  peer1.manufacturer.pharma.net:
+    container_name: peer1.manufacturer.pharma.net
+    extends:
+      file:  docker-base/docker-compose-base.yaml
+      service: peer1.manufacturer.pharma.net
+    networks:
+      - pharma
+
+  peer0.distributor.pharma.net:
+    container_name: peer0.distributor.pharma.net
+    extends:
+      file:  docker-base/docker-compose-base.yaml
+      service: peer0.distributor.pharma.net
+    networks:
+      - pharma
+
+  peer1.distributor.pharma.net:
+    container_name: peer1.distributor.pharma.net
+    extends:
+      file:  docker-base/docker-compose-base.yaml
+      service: peer1.distributor.pharma.net
+    networks:
+      - pharma
+
+  peer0.retailer.pharma.net:
+    container_name: peer0.retailer.pharma.net
+    extends:
+      file:  docker-base/docker-compose-base.yaml
+      service: peer0.retailer.pharma.net
+    networks:
+      - pharma
+
+  peer1.retailer.pharma.net:
+    container_name: peer1.retailer.pharma.net
+    extends:
+      file:  docker-base/docker-compose-base.yaml
+      service: peer1.retailer.pharma.net
+    networks:
+      - pharma
+
+  peer0.transporter.pharma.net:
+    container_name: peer0.transporter.pharma.net
+    extends:
+      file: docker-base/docker-compose-base.yaml
+      service: peer0.transporter.pharma.net
+    networks:
+      - pharma
+
+  peer1.transporter.pharma.net:
+    container_name: peer1.transporter.pharma.net
+    extends:
+      file: docker-base/docker-compose-base.yaml
+      service: peer1.transporter.pharma.net
+    networks:
+      - pharma
+      
+  # peer0.consumer.pharma.net:
+  #   container_name: peer0.consumer.pharma.net
+  #   extends:
+  #     file: docker-base/docker-compose-base.yaml
+  #     service: peer0.consumer.pharma.net
+  #   networks:
+  #     - pharma
+  #
+  # peer1.consumer.pharma.net:
+  #   container_name: peer1.consumer.pharma.net
+  #   extends:
+  #     file: docker-base/docker-compose-base.yaml
+  #     service: peer1.consumer.pharma.net
+  #   networks:
+  #     - pharma
+  #
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:latest
+    stdin_open: true
+    dns_search: .
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.manufacturer.pharma.net:7051
+      - CORE_PEER_LOCALMSPID=manufacturerMSP
+      - CORE_PEER_TLS_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.pharma.net/peers/peer0.manufacturer.pharma.net/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.pharma.net/peers/peer0.manufacturer.pharma.net/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.pharma.net/peers/peer0.manufacturer.pharma.net/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/manufacturer.pharma.net/users/Admin@manufacturer.pharma.net/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./../chaincode/:/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode/
+      - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+      - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+      - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - ca.manufacturer.pharma.net
+      - ca.distributor.pharma.net
+      - ca.retailer.pharma.net
+      - ca.transporter.pharma.net
+      # - ca.consumer.pharma.net
+      - orderer.pharma.net
+      - peer0.manufacturer.pharma.net
+      - peer1.manufacturer.pharma.net
+      - peer0.distributor.pharma.net
+      - peer1.distributor.pharma.net
+      - peer0.retailer.pharma.net
+      - peer1.retailer.pharma.net
+      - peer0.transporter.pharma.net
+      - peer1.transporter.pharma.net
+      # - peer0.consumer.pharma.net
+      # - peer1.consumer.pharma.net
+    networks:
+      - pharma
+
+  chaincode:
+    container_name: chaincode
+    image: hyperledger/fabric-ccenv:latest
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=chaincode
+      - CORE_PEER_ADDRESS=peer0.manufacturer.pharma.net:7051
+      - CORE_PEER_LOCALMSPID=manufacturerMSP
+      - CORE_PEER_TLS_ENABLED=false
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/crypto/peerOrganizations/manufacturer.pharma.net/users/Admin@manufacturer.pharma.net/msp
+      - CORE_TLS_CLIENT_KEY_PATH=/opt/gopath/src/crypto/peerOrganizations/manufacturer.pharma.net/users/Admin@manufacturer.pharma.net/tls/client.key
+      - CORE_TLS_CLIENT_CERT_PATH=/opt/gopath/src/crypto/peerOrganizations/manufacturer.pharma.net/users/Admin@manufacturer.pharma.net/tls/client.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/crypto/peerOrganizations/manufacturer.pharma.net/users/Admin@manufacturer.pharma.net/tls/ca.crt
+    working_dir: /opt/gopath/src/chaincode
+    command: /bin/sh -c 'sleep 6000000'
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./../chaincode:/opt/gopath/src/chaincode
+      - ./crypto-config:/opt/gopath/src/crypto
+    networks:
+      - pharma

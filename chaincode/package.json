@@ -1,0 +1,16 @@
+{
+  "name": "pharmanet",
+  "version": "1.0.0",
+  "description": "Chaincode node application of pharma consortium",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-dev": "fabric-chaincode-node start --peer.address peer0.manufacturer.pharma.net:7053 --chaincode-id-name common:1.0"
+  },
+  "author": "Pratik Jadhav",
+  "license": "ISC",
+  "dependencies": {
+    "fabric-contract-api":"~1.4.2",
+    "fabric-shim":"~1.4.2"
+  }
+}
